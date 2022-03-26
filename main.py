@@ -7,6 +7,7 @@ from keep_alive import keep_alive
 import base64
 import urllib,requests
 from bs4 import BeautifulSoup
+os.system("pip3 install discord-py-slash-command")
 from discord_slash import SlashCommand
 from discord_slash import SlashContext
 from discord_slash.utils import manage_commands
@@ -28,6 +29,7 @@ async def help_(ctx:SlashContext):
 async def 도움(ctx):
     embed = discord.Embed(title="도움말",color=randomcolor(),description="이 봇의 명령어 도움말")
     embed.add_field(name="상태 확인", value="/status <JE(1.4+),BE서버 주소>", inline=False)
+    embed.add_field(name="팁", value="슬래시커맨드로 할 시 서버의 핑이 안좋으면 불러오지 못하니 슬래시커맨드 말고 !status명령어를 입력해주세요", inline=False)
     await ctx.reply(embed=embed)
 @bot.command()
 async def hellothisisverification(ctx):
@@ -59,10 +61,27 @@ async def status(ctx,address):
     player = str(output["players"]["online"]) + " / " + str(output["players"]["max"])
     embed.add_field(name='Player', value=player, inline=False)
     try:
+        data = requests.get(f"https://api.minetools.eu/ping/{address}").json()
+        player = f"{data['players']['sample']}"
+        p = []
+        u = []
+        for i in eval(player):
+            p.append(i["name"])
+            u.append(i["id"])
+        pl = "``"
+        n = 0
+        for i in eval(player):
+            pl = f"{pl}{str(p[n])} ({str(u[n])}), "
+            n =+ 1
+        pl = f"{pl}``"
+        embed.add_field(name='Player List', value=pl, inline=False)
         embed.set_thumbnail(url=f"https://api.mcsrvstat.us/icon/{address}")
+        embed.set_footer(text=f'{ctx.author} 님이 명령어를 사용함', icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=embed)
     except:
-        pass
-    await ctx.send(embed=embed)
+        embed.set_thumbnail(url=f"https://api.mcsrvstat.us/icon/{address}")
+        embed.set_footer(text=f'{ctx.author} 님이 명령어를 사용함', icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=embed)
 @slash.slash(
   name = 'status',
   options=[manage_commands.create_option(
@@ -73,6 +92,7 @@ async def status(ctx,address):
   )]
 )
 async def check(ctx:SlashContext, address:str):
+    await ctx.send(content="추출중입니다. 잠시만 기다려주세요",delete_after=3)
     maker=requests.get(f"https://api.mcsrvstat.us/2/{address}")
     output=maker.json()
     if output["online"] is not True:
@@ -98,9 +118,26 @@ async def check(ctx:SlashContext, address:str):
     player = str(output["players"]["online"]) + " / " + str(output["players"]["max"])
     embed.add_field(name='Player', value=player, inline=False)
     try:
+        data = requests.get(f"https://api.minetools.eu/ping/{address}").json()
+        player = f"{data['players']['sample']}"
+        p = []
+        u = []
+        for i in eval(player):
+            p.append(i["name"])
+            u.append(i["id"])
+        pl = "``"
+        n = 0
+        for i in eval(player):
+            pl = f"{pl}{str(p[n])} ({str(u[n])}), "
+            n =+ 1
+        pl = f"{pl}``"
+        embed.add_field(name='Player List', value=pl, inline=False)
         embed.set_thumbnail(url=f"https://api.mcsrvstat.us/icon/{address}")
+        embed.set_footer(text=f'{ctx.author} 님이 명령어를 사용함', icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=embed)
     except:
-        pass
-    await ctx.send(embed=embed)
+        embed.set_thumbnail(url=f"https://api.mcsrvstat.us/icon/{address}")
+        embed.set_footer(text=f'{ctx.author} 님이 명령어를 사용함', icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=embed)
 keep_alive()
 bot.run(os.getenv("token"))
