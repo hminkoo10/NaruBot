@@ -286,8 +286,8 @@ async def tetris(ctx:SlashContext, player:str):
     embed.add_field(name='40 Line Record Replay', value=f"[Replay](https://tetr.io/#r:{line40replayid})", inline=False)
     blitz = output["data"]["records"]["blitz"]
     blitzrecord = int(blitz["record"]["endcontext"]["score"])
-    embed.add_field(name='Blitz Record', value=f"{line40record}", inline=False)
-    blitzrecordeddate = biltz["record"]["ts"].split("T")[0]
+    embed.add_field(name='Blitz Record', value=f"{blitzrecord}", inline=False)
+    blitzrecordeddate = blitz["record"]["ts"].split("T")[0]
     embed.add_field(name='Blitz Record', value=f"{blitzrecordeddate}", inline=False)
     blitzreplayid = blitz["record"]["replayid"]
     embed.add_field(name='Blitz Record Replay', value=f"[Replay](https://tetr.io/#r:{blitzreplayid})", inline=False)
