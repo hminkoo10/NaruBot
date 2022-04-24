@@ -278,7 +278,7 @@ async def tetris(ctx:SlashContext, player:str):
     maker=requests.get(f"https://ch.tetr.io/api/users/{player}/records/")
     output=maker.json()
     line40 = output["data"]["records"]["40l"]
-    line40record = int(line40["record"]["endcontext"]["finalTime"] // 60000 * 60)
+    line40record = int(line40["record"]["endcontext"]["finalTime"] / 60000 * 60)
     embed.add_field(name='40 Line Record', value=f"{line40record} Seconds", inline=False)
     line40recordeddate = line40["record"]["ts"].split("T")[0]
     embed.add_field(name='40 Line Record', value=f"{line40recordeddate}", inline=False)
