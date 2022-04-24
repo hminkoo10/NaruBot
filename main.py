@@ -275,6 +275,15 @@ async def tetris(ctx:SlashContext, player:str):
     embed.add_field(name='Number of Games Won', value=f"{userinfo['gameswon']}", inline=False)
     embed.add_field(name='Number of Games Played - Tetra League', value=f"{userinfo['league']['gamesplayed']}", inline=False)
     embed.add_field(name='Number of Games Won - Tetra League', value=f"{userinfo['league']['gameswon']}", inline=False)
+    maker=requests.get(f"https://ch.tetr.io/api/users/{player}/records/")
+    output=maker.json()
+    line40 = output["data"]["records"]["40l"]
+    line40record = int(line40["finalTime"] // 6000 * 60)
+    embed.add_field(name='40 Line Record', value=f"{line40record} Seconds", inline=False)
+    line40recordeddate = line40["ts"].split("T")[0]
+    embed.add_field(name='40 Line Record', value=f"{line40recordeddate}", inline=False)
+    line40replayid = line40["record"]["replayid"]
+    embed.add_field(name='40 Line Record Replay', value=f"[Replay](https://tetr.io/#r:{line40replayid})", inline=False)
     embed.set_thumbnail(url=f"https://tetr.io/user-content/avatars/{__id}.jpg")
     embed.set_footer(text=f'{ctx.author} 님이 명령어를 사용함', icon_url=ctx.author.avatar_url)
     await ctx.send(embed=embed)
