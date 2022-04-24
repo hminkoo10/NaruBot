@@ -25,7 +25,7 @@ def randomcolor():
     return random.randint(0x000000,0xffffff)
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Streaming(name="/help",url="https://www.twitch.tv/mcstatuschecker"))
+    await bot.change_presence(activity=discord.Streaming(name="/help",url="https://www.twitch.tv/NaruBot"))
     print(f'{bot.user.name} 준비 끝!')
 @bot.listen()
 async def on_guild_join(guild):
@@ -261,7 +261,11 @@ async def tetris(ctx:SlashContext, player:str):
     embed = discord.Embed(title=f"{player}'s Information", color=random.randint(0x000000,0xFFFFFF))
     __id = output["data"]["user"]["_id"]
     embed.add_field(name='Player Id', value=f"{__id}", inline=False)
-    embed.add_field(name="Player's Country", value=f"{userinfo['country']}", inline=False)
+    if userinfo['country'] is not None:
+        country = f":flag_{userinfo['country']}:"
+    else:
+        country = "None"
+    embed.add_field(name="Player's Country", value=f"{country}", inline=False)
     joineddate = output["data"]["user"]["ts"].split("T")[0]
     embed.add_field(name='Player Joined date', value=f"{joineddate}", inline=False)
     playtime = int(int(userinfo["gametime"]) // 3600)
