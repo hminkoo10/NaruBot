@@ -262,7 +262,7 @@ async def tetris(ctx:SlashContext, player:str):
     __id = output["data"]["user"]["_id"]
     embed.add_field(name='Player Id', value=f"{__id}", inline=False)
     if userinfo['country'] is not None:
-        country = f":flag_{userinfo['country']}:"
+        country = f":flag_{userinfo['country'].lower()}:"
     else:
         country = "None"
     embed.add_field(name="Player's Country", value=f"{country}", inline=False)
