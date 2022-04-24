@@ -277,20 +277,26 @@ async def tetris(ctx:SlashContext, player:str):
     embed.add_field(name='Number of Games Won - Tetra League', value=f"{userinfo['league']['gameswon']}", inline=False)
     maker=requests.get(f"https://ch.tetr.io/api/users/{player}/records/")
     output=maker.json()
-    line40 = output["data"]["records"]["40l"]
-    line40record = int(line40["record"]["endcontext"]["finalTime"] / 60000 * 60)
-    embed.add_field(name='40 Line Record', value=f"{line40record} Seconds", inline=False)
-    line40recordeddate = line40["record"]["ts"].split("T")[0]
-    embed.add_field(name='40 Line Record', value=f"{line40recordeddate}", inline=False)
-    line40replayid = line40["record"]["replayid"]
-    embed.add_field(name='40 Line Record Replay', value=f"[Replay](https://tetr.io/#r:{line40replayid})", inline=False)
-    blitz = output["data"]["records"]["blitz"]
-    blitzrecord = int(blitz["record"]["endcontext"]["score"])
-    embed.add_field(name='Blitz Record', value=f"{blitzrecord}", inline=False)
-    blitzrecordeddate = blitz["record"]["ts"].split("T")[0]
-    embed.add_field(name='Blitz Record', value=f"{blitzrecordeddate}", inline=False)
-    blitzreplayid = blitz["record"]["replayid"]
-    embed.add_field(name='Blitz Record Replay', value=f"[Replay](https://tetr.io/#r:{blitzreplayid})", inline=False)
+    try:
+        line40 = output["data"]["records"]["40l"]
+        line40record = int(line40["record"]["endcontext"]["finalTime"] / 60000 * 60)
+        embed.add_field(name='40 Line Record', value=f"{line40record} Seconds", inline=False)
+        line40recordeddate = line40["record"]["ts"].split("T")[0]
+        embed.add_field(name='40 Line Record', value=f"{line40recordeddate}", inline=False)
+        line40replayid = line40["record"]["replayid"]
+        embed.add_field(name='40 Line Record Replay', value=f"[Replay](https://tetr.io/#r:{line40replayid})", inline=False)
+    except:
+        pass
+    try:
+        blitz = output["data"]["records"]["blitz"]
+        blitzrecord = int(blitz["record"]["endcontext"]["score"])
+        embed.add_field(name='Blitz Record', value=f"{blitzrecord}", inline=False)
+        blitzrecordeddate = blitz["record"]["ts"].split("T")[0]
+        embed.add_field(name='Blitz Record', value=f"{blitzrecordeddate}", inline=False)
+        blitzreplayid = blitz["record"]["replayid"]
+        embed.add_field(name='Blitz Record Replay', value=f"[Replay](https://tetr.io/#r:{blitzreplayid})", inline=False)
+    except:
+        pass
     embed.set_thumbnail(url=f"https://tetr.io/user-content/avatars/{__id}.jpg")
     embed.set_footer(text=f'{ctx.author} 님이 명령어를 사용함', icon_url=ctx.author.avatar_url)
     await ctx.send(embed=embed)
