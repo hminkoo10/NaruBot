@@ -507,13 +507,13 @@ async def 나가(msg):
 @slash.slash(
   name = '재생',
   options=[manage_commands.create_option(
-    name = "url",
+    name = "name",
     description='노래 링크도 가능합니다',
     option_type = 3,
     required = True
   )]
 )
-async def 재생_(ctx:SlashContext, url:str):
+async def 재생_(ctx:SlashContext, name:str):
     try:
         await ctx.voice_client.disconnect()
     except:
@@ -523,17 +523,18 @@ async def 재생_(ctx:SlashContext, url:str):
         ss = await channel.connect()
     except:
         pass
-    player = await YTDLSource.from_url(url)
+    await ctx.channel.send("재생 준비중",hidden=True)
+    player = await YTDLSource.from_url(name)
     print(player.id)
     print(player.title)
     ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
     ctx.voice_client.source = discord.PCMVolumeTransformer(ctx.voice_client.source)
     ctx.voice_client.source.volume = volumes / 100
-    ctx.voice_client.source.title = url
+    ctx.voice_client.source.title = name
     pf.append(player.filename)
     embedt = discord.Embed(title=f'{player.title} 재생중',color=0x00c8ff)
     embedt.set_thumbnail(url=f'https://i.ytimg.com/vi/{player.id}/hqdefault.jpg')
-    await ctx.send(embed=embedt)
+    await ctx.channel.send(embed=embedt)
 @bot.command(pass_context=True, aliases=['p', 'play']) #재생
 async def 재생(ctx, *, url):
     try:
