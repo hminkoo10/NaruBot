@@ -523,7 +523,7 @@ async def 재생_(ctx:SlashContext, name:str):
         ss = await channel.connect()
     except:
         pass
-    await ctx.channel.send("재생 준비중",hidden=True)
+    await ctx.send("재생 준비중",hidden=True)
     player = await YTDLSource.from_url(name)
     print(player.id)
     print(player.title)
