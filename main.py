@@ -1,18 +1,24 @@
 import discord
 from discord.ext import commands
+from discord_slash import SlashCommand
+from discord_slash import SlashContext
+from discord_slash.utils import manage_commands
 import random
 import asyncio
 import os
 from keep_alive import keep_alive
 import base64
 import urllib,requests
+#from selenium import webdriver
+#from selenium.webdriver.chrome.options import Options
+#from selenium.webdriver.support.ui import WebDriverWait
+#from selenium.webdriver.common.by import By
+#from selenium.webdriver.support import expected_conditions as EC
+#from selenium.webdriver.common.keys import Keys
+#from selenium.webdriver import ActionChains
+#import selenium
+import time
 from bs4 import BeautifulSoup
-os.system('pip3 install --upgrade pip')
-os.system('pip3 install youtube_search')
-os.system('pip3 install discord.py[voice]')
-os.system('install-pkg pynacl')
-os.system('install-pkg ffmpeg')
-os.system("pip3 install discord-py-slash-command")
 from discord_slash import SlashCommand
 from discord_slash import SlashContext
 from discord_slash.utils import manage_commands
@@ -29,6 +35,66 @@ intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!',intents=intents)
 slash = SlashCommand(bot, sync_commands=True)
 #lkb_client = lkb.LKBClient(bot=bot, token=os.getenv("dbkrpytoken"))
+ID = "hminkoo10"
+PW = os.getenv("pw")
+
+def click_virtual_btn(driver, target):
+    func_g = driver.find_element_by_xpath("//img[@alt='{}']".format(target))
+    func_g = func_g.find_element_by_xpath("./../..")
+    func_g.click()
+
+def charge_pin(pin):
+    try:
+        #chrome_options = Options()
+        #chrome_options.add_argument('headless')
+        driver = webdriver.Chrome()#, options=chrome_options)
+
+        # 로그인하기
+        driver.get("https://m.cultureland.co.kr/mmb/loginMain.do")
+
+        WebDriverWait(driver, 200).until(
+                EC.element_to_be_clickable((By.ID, 'btnLogin'))
+            )
+
+        driver.find_element_by_name("userId").send_keys(ID)
+
+        driver.find_element_by_name("passwd").click()
+
+        for i in PW:
+            click_virtual_btn(driver, i)
+
+        driver.find_element_by_id("mtk_done").click()
+        driver.find_element_by_id("btnLogin").click()
+
+        # 핀번호 충전하기
+        driver.get("https://m.cultureland.co.kr/csh/cshGiftCard.do")
+
+        WebDriverWait(driver, 200).until(
+                EC.element_to_be_clickable((By.ID, 'btnCshFrom'))
+            )
+        driver.find_element_by_id("txtScr11").send_keys(pin[0:4])
+        driver.find_element_by_id("txtScr12").send_keys(pin[4:8])
+        driver.find_element_by_id("txtScr13").send_keys(pin[8:12])
+        for i in range(12, len(pin)):
+            click_virtual_btn(driver, pin[i])
+            time.sleep(0.1)
+            
+        time.sleep(1)
+        driver.find_element_by_id("btnCshFrom").click()
+
+        # 결과 확인하기
+        WebDriverWait(driver, 200).until(
+                EC.element_to_be_clickable((By.ID, 'inSafeSub'))
+            )
+
+        result = driver.find_element_by_xpath("//*[@id='wrap']/div[3]/section/dl/dd").get_attribute("innerHTML")
+        result = result[:-1]
+
+        driver.quit()
+        return result
+
+    except:
+        return "0"
 def randomcolor():
     return random.randint(0x000000,0xffffff)
 @bot.event
@@ -91,7 +157,9 @@ async def status(ctx,address):
         for i in eval(player):
             pl = f"{pl}{str(p[n])} ({str(u[n])}), "
             n =+ 1
-        pl = f"{pl}``"
+        pl = f"``{pl}``"
+        if pl is "````":
+            pl = "too many players!"
         embed.add_field(name='Player List', value=pl, inline=False)
         embed.set_thumbnail(url=f"https://api.mcsrvstat.us/icon/{address}")
         embed.set_footer(text=f'{ctx.author} 님이 명령어를 사용함', icon_url=ctx.author.avatar_url)
@@ -149,6 +217,8 @@ async def check(ctx:SlashContext, address:str):
             pl = f"{pl}{str(p[n])} ({str(u[n])}), "
             n =+ 1
         pl = f"{pl}``"
+        if pl is "````":
+            pl = "too many players!"
         embed.add_field(name='Player List', value=pl, inline=False)
         embed.set_thumbnail(url=f"https://api.mcsrvstat.us/icon/{address}")
         embed.set_footer(text=f'{ctx.author} 님이 명령어를 사용함', icon_url=ctx.author.avatar_url)
@@ -308,6 +378,17 @@ async def tetris(ctx:SlashContext, player:str):
     embed.set_thumbnail(url=f"https://tetr.io/user-content/avatars/{__id}.jpg")
     embed.set_footer(text=f'{ctx.author} 님이 명령어를 사용함', icon_url=ctx.author.avatar_url)
     await ctx.send(embed=embed)
+"""
+@bot.command()
+async def donate(ctx, pin):
+    await ctx.channel.purge(limit=1)
+    result = charge_pin(pin)
+    if result == "0":
+        embed = discord.Embed(title="오류",description="상품권 번호가 올바르지 않습니다.",color=discord.Color.red())
+    else:
+        embed = discord.Embed(title="성공",description="{}원을 후원해주셔서 감사합니다!".format(result),color=discord.Color.green())
+        print("충전 성공 : {}원이 충전 되었습니다.".format(result))
+"""
 volumes = 25
 admin = ['657773087571574784']
 pf = []
