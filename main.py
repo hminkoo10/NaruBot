@@ -25,6 +25,7 @@ from discord_slash.utils import manage_commands
 from discord.utils import get
 from youtube_search import YoutubeSearch
 import youtube_dl
+import re
 try:
   import light_koreanbots as lkb
 except:
@@ -104,6 +105,55 @@ async def on_ready():
 @bot.listen()
 async def on_guild_join(guild):
     await guild.owner.send(f'`{bot.user.name}`를 {guild.name}에 초대해주셔서 감사드립니다!\n앞으로 {bot.user.name}는 더 발전하겠습니다 \n https://koreanbots.dev/bots/936468074314493954 여기서 하트추가를 눌러주시면 감사하겠습니다!')
+@bot.listen()
+async def on_command_error(ctx, error):
+	print(error)
+	m = re.search(r'You are on cooldown. Try again in (.*)s', str(error))
+	if m:
+		asdf = m.groups()[0]
+		embed = discord.Embed(
+		    title="잠시만요!",
+		    description=f"쿨타임에 걸렸어요! 이 명령어를 {asdf}초 후에 다시 사용하실 수 있어요!")
+		await ctx.message.reply(embed=embed)
+		return
+	else:
+		m = re.search(r'Command "(.*)" is not found', str(error))
+		if m:
+			asdf = m.groups()[0]
+			embed = discord.Embed(
+			    title="잠시만요!",
+			    description=
+			    f"이 명령어를 사용할 수 없어요! `={asdf}`는 없는 명령어에요! 다른 명령어로 변경됬을 수도 있으니 `=help`로 모든 명령어 목록을 보세요!"
+			)
+			#await ctx.message.reply(embed=embed)
+			return
+		else:
+			m = re.search(r'User "(.*)" not found.', str(error))
+			if m:
+				asdf = m.groups()[0]
+				embed = discord.Embed(
+				    title="잠시만요!",
+				    description=
+				    f"이 명령어를 사용할 수 없어요! `{asdf}`는 없는 사용자에요! 사용자 멘션이나 사용자의 풀 닉네임을 제시해주세요!"
+				)
+				await ctx.message.reply(embed=embed)
+				return
+			elif str(error) == "This command can only be used in private messages.":
+				embed = discord.Embed(
+				    title="잠시만요!",
+				    description=
+				    f"이 명령어를 사용할 수 없어요! 이 명령어는 제 DM으로만 사용할 수 있어요! 혹시 모르니 DM을 보내드릴게요!"
+				)				
+				await ctx.message.reply(embed=embed)
+				await ctx.author.send("사용할 수 없던 명령어를 이곳, 제 DM에서 쳐보세요. 서버 채팅에서 친다면 누가 사용자님의 개인정보를 훔쳐갈지도 몰라요! :eyes:")
+			else:
+				embed = discord.Embed(
+				    title="잠시만요!",
+				    description=
+				    f"이 명령어를 사용할 수 없어요! 발생한 오류는 다음과 같아요! \n\n```{str(error)}```"
+				)
+				await ctx.message.reply(embed=embed)
+				return
 @slash.slash(name='help')
 async def help_(ctx:SlashContext):
     embed = discord.Embed(title="도움말",color=randomcolor(),description="이 봇의 명령어 도움말")
@@ -158,7 +208,7 @@ async def status(ctx,address):
             pl = f"{pl}{str(p[n])} ({str(u[n])}), "
             n =+ 1
         pl = f"``{pl}``"
-        if pl is "````":
+        if pl == "````":
             pl = "too many players!"
         embed.add_field(name='Player List', value=pl, inline=False)
         embed.set_thumbnail(url=f"https://api.mcsrvstat.us/icon/{address}")
@@ -217,7 +267,7 @@ async def check(ctx:SlashContext, address:str):
             pl = f"{pl}{str(p[n])} ({str(u[n])}), "
             n =+ 1
         pl = f"{pl}``"
-        if pl is "````":
+        if pl == "````":
             pl = "too many players!"
         embed.add_field(name='Player List', value=pl, inline=False)
         embed.set_thumbnail(url=f"https://api.mcsrvstat.us/icon/{address}")
